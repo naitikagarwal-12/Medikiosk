@@ -1,0 +1,79 @@
+services:
+  - type: web
+    name: medikiosk-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: node dist/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1h
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 7d
+      - key: CORS_ORIGIN
+        sync: false
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX
+        value: 100
+      - key: ABHA_API_URL
+        value: https://api.abha.gov.in/v1
+      - key: ABHA_API_KEY
+        sync: false
+      - key: ABHA_API_SECRET
+        sync: false
+      - key: GROQ_API_URL
+        value: https://api.groq.com/openai/v1
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OCR_PROVIDER
+        value: tesseract
+      - key: UPLOAD_DIR
+        value: ./uploads
+      - key: MAX_FILE_SIZE
+        value: 5242880
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+
+  - type: web
+    name: medikiosk-bhashini
+    runtime: python
+    rootDir: backend/bhashini
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn "app:create_app()" --bind 0.0.0.0:$PORT --workers 2
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: FLASK_DEBUG
+        value: 0
+      - key: CORS_ORIGIN
+        sync: false
+      - key: BHASHINI_API_KEY
+        sync: false
+      - key: BHASHINI_UDYAT_KEY
+        sync: false
+      - key: BHASHINI_INFERENCE_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
